@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 import com.dumbster.smtp.SmtpMessage;
 import com.t4skforce.mailtest.annitation.SmtpServer;
 import com.t4skforce.mailtest.annitation.wait.Header;
-import com.t4skforce.mailtest.annitation.wait.Wait;
+import com.t4skforce.mailtest.annitation.wait.WaitFor;
 
 import static org.junit.Assert.assertThat;
 
@@ -110,7 +110,7 @@ public class MailTest extends AbstractBaseTestClass {
 	
 	@Test
 	@SmtpServer(timeout=10000,waitFor={ 
-			@Wait(headers=@Header(key="Subject",value="Test23")) 
+			@WaitFor(headers=@Header(key="Subject",value="Test23")) 
 	})
 	public void testSendReceiveMultibleMailHeader() throws Exception
 	{
@@ -126,7 +126,7 @@ public class MailTest extends AbstractBaseTestClass {
 	
 	@Test(expected=TimeLimitExceededException.class)
 	@SmtpServer(timeout=1000,waitFor={ 
-			@Wait(headers=@Header(key="Subject",value="DoesNotExist")) 
+			@WaitFor(headers=@Header(key="Subject",value="DoesNotExist")) 
 	})
 	public void testSendReceiveMultibleMailHeaderError1() throws Exception
 	{
@@ -141,7 +141,7 @@ public class MailTest extends AbstractBaseTestClass {
 	
 	@Test(expected=TimeLimitExceededException.class)
 	@SmtpServer(timeout=1000,waitFor={ 
-			@Wait(headers=@Header(key="DoesNotExist",value="")) 
+			@WaitFor(headers=@Header(key="DoesNotExist",value="")) 
 	})
 	public void testSendReceiveMultibleMailHeaderKeyError() throws Exception
 	{

@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Target(ANNOTATION_TYPE)
-public @interface Wait {
+public @interface WaitFor {
 	Header[] headers() default {};
 	Body[] body() default {};
-	String message() default "@Wait('{'{0}'}') condition not met";
+	String message() default "@WaitFor('{'{0}'}') condition not met";
 }

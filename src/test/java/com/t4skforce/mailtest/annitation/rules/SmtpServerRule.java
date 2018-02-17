@@ -23,7 +23,7 @@ import com.dumbster.smtp.SmtpMessage;
 import com.t4skforce.mailtest.annitation.SmtpServer;
 import com.t4skforce.mailtest.annitation.wait.Body;
 import com.t4skforce.mailtest.annitation.wait.Header;
-import com.t4skforce.mailtest.annitation.wait.Wait;
+import com.t4skforce.mailtest.annitation.wait.WaitFor;
 
 public class SmtpServerRule implements TestRule {
 
@@ -97,7 +97,7 @@ public class SmtpServerRule implements TestRule {
 		List<SmtpMessage> receivedMail = new ArrayList<>();
 		long startTime = System.currentTimeMillis();
 		
-		List<Wait> invalid = new ArrayList<Wait>();
+		List<WaitFor> invalid = new ArrayList<WaitFor>();
 		if(serverAnnotation.waitFor().length > 0) 
 		{
 			invalid.addAll(Arrays.asList(serverAnnotation.waitFor()));
@@ -123,8 +123,8 @@ public class SmtpServerRule implements TestRule {
 					
 					for(SmtpMessage mail : toCheckMails)
 					{
-						List<Wait> valid = new ArrayList<Wait>();
-						for(Wait wait : invalid)
+						List<WaitFor> valid = new ArrayList<WaitFor>();
+						for(WaitFor wait : invalid)
 						{
 							if(isValid(wait,mail)) {
 								valid.add(wait);
@@ -139,14 +139,14 @@ public class SmtpServerRule implements TestRule {
 		if(CollectionUtils.isEmpty(invalid)) {
 			throw new TimeLimitExceededException(MessageFormat.format(serverAnnotation.message(), receivedMail.size(), serverAnnotation.count() ,(System.currentTimeMillis() - startTime)));
 		} else {
-			for(Wait wait : invalid){
+			for(WaitFor wait : invalid){
 				throw new TimeLimitExceededException(stringOf(wait));
 			}
 		}
 		return receivedMail;
 	}
 	
-	private String stringOf(Wait wait) {
+	private String stringOf(WaitFor wait) {
 		List<String> conditions = new ArrayList<>();
 				
 		Header[] headers = wait.headers();
@@ -165,7 +165,7 @@ public class SmtpServerRule implements TestRule {
 	}
 	
 
-	private boolean isValid(Wait wait,SmtpMessage mail)
+	private boolean isValid(WaitFor wait,SmtpMessage mail)
 	{
 		Header[] headers = wait.headers();
 		if(!areValid(headers,mail)) {

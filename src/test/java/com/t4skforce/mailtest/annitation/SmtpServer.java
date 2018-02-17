@@ -9,7 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import com.dumbster.smtp.SimpleSmtpServer;
-import com.t4skforce.mailtest.annitation.wait.Wait;
+import com.t4skforce.mailtest.annitation.wait.WaitFor;
 
 @Documented
 @Retention(RUNTIME)
@@ -33,7 +33,7 @@ public @interface SmtpServer {
 	 * A list if conditions the method {@link com.t4skforce.mailtest.annitation.rules.SmtpServerRule#getReceivedEmails} should wait for before returning the values
 	 * @return list of conditions to wait for
 	 */
-	public Wait[] waitFor() default { };
+	public WaitFor[] waitFor() default { };
 	
 	/**
 	 * Minimum count of mails to receive before {@link com.t4skforce.mailtest.annitation.rules.SmtpServerRule#getReceivedEmails} returns without error 
