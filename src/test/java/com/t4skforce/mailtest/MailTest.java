@@ -14,6 +14,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is; 
 import com.dumbster.smtp.SmtpMessage;
 import com.t4skforce.mailtest.annitation.SmtpServer;
+import com.t4skforce.mailtest.annitation.wait.Header;
+import com.t4skforce.mailtest.annitation.wait.Wait;
+
 import static org.junit.Assert.assertThat;
 
 public class MailTest extends AbstractBaseTestClass {
@@ -77,6 +80,78 @@ public class MailTest extends AbstractBaseTestClass {
             assertThat(email.getBody(), is("Test Body"+i));
             assertThat(email.getHeaderValue("To"), is("receiver"+i+"@there.com"));	
         }
+	}
+	
+	@Test
+	@SmtpServer(timeout=10000,count=12)
+	public void testSendReceiveMultibleMailCount() throws Exception
+	{
+		int msgs = 24;
+		for(int i=0;i<msgs;i++)
+		{
+			sendMessage("sender"+i+"@here.com", "Test"+i, "Test Body"+i, "receiver"+i+"@there.com");
+		}
+		List<SmtpMessage> emails = smtpserver.getReceivedEmails();
+		assertThat(emails, hasSize(msgs));
+	}
+	
+	@Test(timeout=6000,expected=TimeLimitExceededException.class)
+	@SmtpServer(timeout=1000,count=12)
+	public void testSendReceiveMultibleMailCountException() throws Exception
+	{
+		int msgs = 11;
+		for(int i=0;i<msgs;i++)
+		{
+			sendMessage("sender"+i+"@here.com", "Test"+i, "Test Body"+i, "receiver"+i+"@there.com");
+		}
+		List<SmtpMessage> emails = smtpserver.getReceivedEmails();
+		assertThat(emails, hasSize(msgs));
+	}
+	
+	@Test
+	@SmtpServer(timeout=10000,waitFor={ 
+			@Wait(headers=@Header(key="Subject",value="Test23")) 
+	})
+	public void testSendReceiveMultibleMailHeader() throws Exception
+	{
+		int msgs = 24;
+		for(int i=0;i<msgs;i++)
+		{
+			sendMessage("sender"+i+"@here.com", "Test"+i, "Test Body"+i, "receiver"+i+"@there.com");
+		}
+		List<SmtpMessage> emails = smtpserver.getReceivedEmails();
+		assertThat(emails, hasSize(msgs));
+		assertThat(emails.get(23).getHeaderValue("Subject"), is("Test23"));
+	}
+	
+	@Test(expected=TimeLimitExceededException.class)
+	@SmtpServer(timeout=1000,waitFor={ 
+			@Wait(headers=@Header(key="Subject",value="DoesNotExist")) 
+	})
+	public void testSendReceiveMultibleMailHeaderError1() throws Exception
+	{
+		int msgs = 24;
+		for(int i=0;i<msgs;i++)
+		{
+			sendMessage("sender"+i+"@here.com", "Test"+i, "Test Body"+i, "receiver"+i+"@there.com");
+		}
+		List<SmtpMessage> emails = smtpserver.getReceivedEmails();
+		assertThat(emails, hasSize(msgs));
+	}
+	
+	@Test(expected=TimeLimitExceededException.class)
+	@SmtpServer(timeout=1000,waitFor={ 
+			@Wait(headers=@Header(key="DoesNotExist",value="")) 
+	})
+	public void testSendReceiveMultibleMailHeaderKeyError() throws Exception
+	{
+		int msgs = 24;
+		for(int i=0;i<msgs;i++)
+		{
+			sendMessage("sender"+i+"@here.com", "Test"+i, "Test Body"+i, "receiver"+i+"@there.com");
+		}
+		List<SmtpMessage> emails = smtpserver.getReceivedEmails();
+		assertThat(emails, hasSize(msgs));
 	}
 
 	private void sendMessage(String from, String subject, String body, String to) {
